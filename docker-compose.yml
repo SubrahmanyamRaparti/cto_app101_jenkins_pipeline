@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  jenkins:
+    container_name: "jenkins"
+    image: jenkins/jenkins:lts
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    volumes:
+    # Make sure to a create a directory called jenkins_home outside the current directory and set the owner to 1000:1000
+      - ../jenkins_home/:/var/jenkins_home
+
+networks:
+  # The presence of these objects is sufficient to define them
+  backend:
