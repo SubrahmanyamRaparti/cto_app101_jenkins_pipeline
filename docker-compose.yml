@@ -10,7 +10,47 @@ services:
     volumes:
     # Make sure to a create a directory called jenkins_home outside the current directory and set the owner to 1000:1000
       - ../jenkins_home/:/var/jenkins_home
+      
+  sonarqube:
+    container_name: "sonarqube"
+    image: sonarqube:community
+    ports:
+      - "9000:9000"
+    networks:
+      - backend
+    volumes:
+    # As per SonarQube docs, use named volumes instead of not bind mounts.
+    # Using bind mounts prevents plugins from populating correctly.
+    # If container stops with vm.max_map_count too low they try setting it to "sysctl -w vm.max_map_count=262144"
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    depends_on:
+      - db
+      
+  db:
+    container_name: "postgres"
+    image: postgres:12
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data  
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
 
 networks:
-  # The presence of these objects is sufficient to define them
   backend:
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql:
+  postgresql_data:
