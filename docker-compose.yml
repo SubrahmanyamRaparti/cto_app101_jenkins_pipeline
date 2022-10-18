@@ -2,7 +2,8 @@ version: "3.8"
 services:
   jenkins:
     container_name: "jenkins"
-    image: jenkins/jenkins:lts
+    image: subrahmanyamr/jenkins-docker:latest
+    build: ./jenkins/.
     ports:
       - "8080:8080"
     networks:
@@ -10,6 +11,8 @@ services:
     volumes:
     # Make sure to a create a directory called jenkins_home outside the current directory and set the owner to 1000:1000
       - ../jenkins_home/:/var/jenkins_home
+    # set /var/run/docker.sock to 777 (Read, write & Execute everyone) to avoid errors while docker in jenkins
+      - /var/run/docker.sock:/var/run/docker.sock
       
   sonarqube:
     container_name: "sonarqube"
